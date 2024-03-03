@@ -6,6 +6,7 @@ import com.ra.entity.Product;
 import com.ra.model.ContStatus;
 import com.ra.repository.Repository;
 import com.ra.repository.impl.RepositoryImpl;
+import com.ra.service.admin.impl.AccountServiceImpl;
 import com.ra.service.admin.impl.EmployeeServiceImpl;
 import com.ra.util.Console;
 
@@ -19,7 +20,7 @@ import java.util.Scanner;
 public class EmployeeManagement {
     static EmployeeServiceImpl employeeService = new EmployeeServiceImpl();
 
-    public static void employeeManagement(Scanner scanner) {
+    public static void employeeManagement() {
         boolean isExist = true;
         do {
             System.out.println("******************EMPLOYEE MANAGEMENT****************");
@@ -29,7 +30,7 @@ public class EmployeeManagement {
             System.out.println("4.Cập nhật trạng thái nhân viên");
             System.out.println("5.Tìm kiếm nhân viên");
             System.out.println("6.Thoát");
-            System.out.print("Chọn: ");
+            System.out.print("Chọn chức năng: ");
             int choice = Integer.parseInt(Console.scanner.nextLine());
             switch (choice) {
                 case 1:
@@ -52,7 +53,7 @@ public class EmployeeManagement {
                     System.out.println("Quay lại menu chính.");
                     break;
                 default:
-                    System.out.println("Chọn không hợp lệ. Vui lòng chọn lại.");
+                    System.out.println("Lựa chọn không hợp lệ. Vui lòng chọn lại.");
             }
 
         } while (isExist);
@@ -64,14 +65,13 @@ public class EmployeeManagement {
 
         if (!employeeList.isEmpty()) {
             System.out.println("Danh sách nhân viên:");
-            System.out.format("%-15s%-15s%-15s%-20s%-15s%-30s%-15s\n",
+            System.out.format("%-15s%-30s%-15s%-35s%-15s%-35s%-15s\n",
                     "Mã nhân viên", "Tên nhân viên", "Ngày sinh",
                     "Email", "Số điện thoại", "Địa chỉ", "Trạng thái");
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             employeeList.stream().sorted(Comparator.comparing(Employee::getEmpName))
-                    .limit(10)
-                    .forEach(employee -> System.out.format("%-15s%-15s%-15s%-20s%-15s%-30s%-15s\n",
+                    .forEach(employee -> System.out.format("%-15s%-30s%-15s%-35s%-15s%-35s%-15s\n",
                             employee.getEmpId(), employee.getEmpName(),
                             dateFormat.format(employee.getBirthOfDate()), employee.getEmail(),
                             employee.getPhone(), employee.getAddress(),
@@ -106,9 +106,12 @@ public class EmployeeManagement {
             System.out.println("Nhập Email:");
             String email = Console.scanner.nextLine();
             employee.setEmail(email);
-            System.out.println("Nhập số điệ thoại:");
+            System.out.println("Nhập số điện thoại:");
             String phone = Console.scanner.nextLine();
             employee.setPhone(phone);
+            System.out.println("Nhập địa chỉ:");
+            String address = Console.scanner.nextLine();
+            employee.setAddress(address);
             System.out.println("Nhập trạng thái");
             int status = Integer.parseInt(Console.scanner.nextLine());
             employee.setEmpStatus(status);
@@ -161,23 +164,23 @@ public class EmployeeManagement {
         String empName = Console.scanner.nextLine();
         Employee employee = employeeRepository.findName(empName, Employee.class);
         if (employee != null) {
-            System.out.format("%-15s%-15s%-15s%-20s%-15s%-30s%-15s\n",
+            System.out.format("%-15s%-30s%-15s%-35s%-15s%-35s%-15s\n",
                     "Mã nhân viên", "Tên nhân viên", "Ngày sinh",
                     "Email", "Số điện thoại", "Địa chỉ", "Trạng thái");
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            System.out.format("%-15s%-15s%-15s%-20s%-15s%-30s%-15s\n",
+            System.out.format("%-15s%-30s%-15s%-35s%-15s%-35s%-15s\n",
                     employee.getEmpId(), employee.getEmpName(),
                     dateFormat.format(employee.getBirthOfDate()), employee.getEmail(),
                     employee.getPhone(), employee.getAddress(),
                     employeeService.getStatusString(employee.getEmpStatus()));
         } else {
-            System.out.println("Sản phẩm không tồn tại!");
+            System.out.println("Nhân viên không tồn tại!");
         }
     }
-    public static void updateEmployeeStatus(){
+
+    public static void updateEmployeeStatus() {
         Repository<Employee, String> employeeRepository = new RepositoryImpl<>();
-        Repository<Account,String> accountRepository = new RepositoryImpl<>();
         System.out.println("Nhập vào mã nhân viên cần cập nhật trạng thái:");
         String empId = Console.scanner.nextLine();
         Employee employeeToUpdate = employeeRepository.findId(empId, Employee.class);
@@ -201,11 +204,6 @@ public class EmployeeManagement {
                         break;
                     case 2:
                         employeeToUpdate.setEmpStatus(ContStatus.EmpStt.QUIT);
-                        Account associatedAccount = accountRepository.findId(empId, Account.class);
-                        if (associatedAccount != null) {
-                            associatedAccount.setAccStatus(ContStatus.AccountStt.BLOCK);
-                            accountRepository.edit(associatedAccount);
-                        }
                         break;
                     default:
                         System.out.println("Trạng thái không hợp lệ!");

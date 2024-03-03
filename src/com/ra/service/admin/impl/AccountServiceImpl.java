@@ -1,18 +1,26 @@
 package com.ra.service.admin.impl;
 
 import com.ra.entity.Account;
+import com.ra.entity.BillDetail;
 import com.ra.model.PermissionType;
 import com.ra.repository.Repository;
 import com.ra.repository.impl.RepositoryImpl;
 import com.ra.service.admin.AccountService;
+import com.ra.util.MySqlConnect;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account findId(int accId) {
-        Repository<Account,Integer> accountRepository = new RepositoryImpl<>();
-        Account account = accountRepository.findId(accId,Account.class);
-        if (account.getAccId()==accId){
+        Repository<Account, Integer> accountRepository = new RepositoryImpl<>();
+        Account account = accountRepository.findId(accId, Account.class);
+        if (account.getAccId() == accId) {
             return account;
         }
         return null;
@@ -20,29 +28,33 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public String findName(String userName) {
-        Repository<Account,String> newAccRepository = new RepositoryImpl<>();
+        Repository<Account, String> newAccRepository = new RepositoryImpl<>();
         Account account = newAccRepository.findName(userName, Account.class);
         return account.getUserName();
     }
+
     @Override
-    public  Account login(String username,String password){
-        Repository<Account,String> newAccRepository = new RepositoryImpl<>();
+    public Account login(String username, String password) {
+        Repository<Account, String> newAccRepository = new RepositoryImpl<>();
         Account account = newAccRepository.findName(username, Account.class);
-        if (account == null){
+        if (account == null) {
             System.out.println("Tài khoản không tồn tại");
             return null;
         }
-        if (!account.getPassword().equals(password)){
+        if (!account.getPassword().equals(password)) {
             System.out.println("Sai mật khẩu");
             return null;
         }
         return account;
     }
+
     @Override
-    public  String authenticate(String username, String password) {
+    public String authenticate(String username, String password) {
         AccountServiceImpl accountService = new AccountServiceImpl();
-        Account account = accountService.login(username,password);
+        Account account = accountService.login(username, password);
         if (account != null) {
+            System.setProperty("user.name", username);
+            System.setProperty("user.id", account.getEmpId());
             if (PermissionType.ADMIN == account.isPermission()) {
                 return "admin";
             } else {
@@ -51,5 +63,6 @@ public class AccountServiceImpl implements AccountService {
         }
         return "Không hợp lệ";
     }
+
 
 }

@@ -113,23 +113,23 @@ VALUES
 ('E0015', 'Robert Perez', '1983-11-11', 'robert.perez@example.com', '951426357', '890 Lemon St, City, Country', 1);
 
 -- Chèn dữ liệu vào bảng ACCOUNT
-INSERT INTO ACCOUNT (User_Name, Password, Emp_Id) 
+INSERT INTO ACCOUNT (User_Name, Password, Permission, Emp_Id, Acc_Status) 
 VALUES 
-('admin', 'admin_password', 'E0001'),
-('user1', 'user1_password', 'E0002'),
-('user2', 'user2_password', 'E0003'),
-('user3', 'user3_password', 'E0004'),
-('user4', 'user4_password', 'E0005'),
-('user5', 'user5_password', 'E0006'),
-('user6', 'user6_password', 'E0007'),
-('user7', 'user7_password', 'E0008'),
-('user8', 'user8_password', 'E0009'),
-('user9', 'user9_password', 'E0010'),
-('user10', 'user10_password', 'E0011'),
-('user11', 'user11_password', 'E0012'),
-('user12', 'user12_password', 'E0013'),
-('user13', 'user13_password', 'E0014'),
-('user14', 'user14_password', 'E0015');
+('admin', 'admin123', 0, 'E0001', 1),
+('user1', 'user1', 1, 'E0002', 1),
+('user2', 'user2', 1, 'E0003', 1),
+('user3', 'user3', 1, 'E0004', 1),
+('user4', 'user4', 1, 'E0005', 1),
+('user5', 'user5', 1, 'E0006', 1),
+('user6', 'user6', 1, 'E0007', 1),
+('user7', 'user7', 1, 'E0008', 1),
+('user8', 'user8', 1, 'E0009', 1),
+('user9', 'user9', 1, 'E0010', 1),
+('user10', 'user10', 1, 'E0011', 1),
+('user11', 'user11', 1, 'E0012', 1),
+('user12', 'user12', 1, 'E0013', 1),
+('user13', 'user13', 1, 'E0014', 1),
+('user14', 'user14', 1, 'E0015', 1);
 
 -- Chèn dữ liệu vào bảng BILL
 INSERT INTO BILL (Bill_Code, Bill_Type, Emp_Id_Created, Emp_Id_Auth, Bill_Status) 
@@ -169,6 +169,166 @@ VALUES
 (7, 'P0014', 1, 79.99),
 (8, 'P0015', 1, 699.99);
 
+-- 1.Thống kê chi phí theo ngaỳ tháng năm
+DELIMITER //
+CREATE PROCEDURE CostByDate()
+BEGIN
+    SELECT 
+        IFNULL(DATE_FORMAT(b.Created, '%Y-%m-%d'), 'Total') AS Year_Month_Date,
+        SUM(bd.Quantity * bd.Price) AS Total_Cost
+    FROM BILL b
+    JOIN BILL_DETAIL bd ON b.Bill_id = bd.Bill_Id
+    JOIN PRODUCT p ON bd.Product_Id = p.Product_Id
+    GROUP BY Year_Month_Date WITH ROLLUP;
+END//
+DELIMITER ;
+CALL CostByDate();
 
+
+-- 2.Thống kê chi phí theo khoảng thời gian
+DELIMITER //
+CREATE PROCEDURE CostByTimeRange(IN startDate DATE,IN endDate DATE)
+BEGIN
+    SELECT 
+        DATE_FORMAT(b.Created, '%Y-%m-%d') AS Year_Month_Date,
+        SUM(bd.Quantity * bd.Price) AS Total_Cost
+    FROM BILL b
+    JOIN BILL_DETAIL bd ON b.Bill_id = bd.Bill_Id
+    JOIN PRODUCT p ON bd.Product_Id = p.Product_Id
+    WHERE b.Created BETWEEN startDate AND endDate
+    GROUP BY Year_Month_Date;
+END//
+DELIMITER ;
+CALL CostByTimeRange('2024-01-01', '2024-03-31');
+
+
+-- 3.Thống kê doanh thu theo ngày tháng năm 
+DELIMITER //
+CREATE PROCEDURE RevenueByDate()
+BEGIN
+    SELECT 
+        DATE_FORMAT(b.Created, '%Y-%m-%d') AS Date,
+        SUM(bd.Quantity * bd.Price) AS Revenue
+    FROM BILL b
+    JOIN BILL_DETAIL bd ON b.Bill_id = bd.Bill_Id
+    JOIN PRODUCT p ON bd.Product_Id = p.Product_Id
+    GROUP BY Date;
+END//
+DELIMITER ;
+CALL RevenueByDate();
+
+
+-- 4.Thống kê doanh thu theo khoảng thời gian
+DELIMITER //
+CREATE PROCEDURE RevenueByTimeRange(IN startDate DATE,IN endDate DATE)
+BEGIN
+    SELECT 
+        DATE_FORMAT(b.Created, '%Y-%m-%d') AS Date,
+        SUM(bd.Quantity * bd.Price) AS Revenue
+    FROM BILL b
+    JOIN BILL_DETAIL bd ON b.Bill_id = bd.Bill_Id
+    JOIN PRODUCT p ON bd.Product_Id = p.Product_Id
+    WHERE b.Created BETWEEN startDate AND endDate
+    GROUP BY Date;
+END//
+DELIMITER ;
+CALL RevenueByTimeRange('2024-01-01', '2024-03-31');
+
+
+-- 5.Thống kê số nhân viên theo từng trạng thái
+DELIMITER //
+CREATE PROCEDURE EmployeeStatusCount()
+BEGIN
+    SELECT 
+        CASE Emp_Status 
+            WHEN 0 THEN 'Inactive' 
+            WHEN 1 THEN 'Active' 
+            ELSE 'Unknown' 
+        END AS Employee_Status,
+        COUNT(*) AS Employee_Count
+    FROM EMPLOYEE
+    GROUP BY Emp_Status;
+END//
+DELIMITER ;
+CALL EmployeeStatusCount();
+
+
+
+-- 6.Thống kê sản phẩm nhập nhiều nhất trong khoảng thời gian
+DELIMITER //
+CREATE PROCEDURE MostImportedProduct(IN startDate DATE,IN endDate DATE)
+BEGIN
+    SELECT 
+        p.Product_Name,
+        SUM(CASE WHEN b.Bill_Type = 1 THEN bd.Quantity ELSE 0 END) AS Total_Import_Quantity
+    FROM BILL b
+    JOIN BILL_DETAIL bd ON b.Bill_id = bd.Bill_Id
+    JOIN PRODUCT p ON bd.Product_Id = p.Product_Id
+    WHERE b.Created BETWEEN startDate AND endDate AND b.Bill_Type = 1
+    GROUP BY bd.Product_Id
+    ORDER BY Total_Import_Quantity DESC
+    LIMIT 1;
+END//
+DELIMITER ;
+CALL MostImportedProduct('2024-01-01', '2024-03-31');
+
+
+
+-- 7.Thống kê sản phẩm nhập ít nhất trong khoảng thời gian
+DELIMITER //
+CREATE PROCEDURE LeastImportedProduct(IN startDate DATE,IN endDate DATE)
+BEGIN
+    SELECT 
+        p.Product_Name,
+        SUM(CASE WHEN b.Bill_Type = 1 THEN bd.Quantity ELSE 0 END) AS Total_Import_Quantity
+    FROM BILL b
+    JOIN BILL_DETAIL bd ON b.Bill_id = bd.Bill_Id
+    JOIN PRODUCT p ON bd.Product_Id = p.Product_Id
+    WHERE b.Created BETWEEN startDate AND endDate
+    GROUP BY bd.Product_Id
+    ORDER BY Total_Import_Quantity ASC
+    LIMIT 1;
+END//
+DELIMITER ;
+CALL LeastImportedProduct('2024-01-01', '2024-03-31');
+
+
+-- 8.Thống kê sản phẩm xuất nhiều nhất trong khoảng thời gian
+DELIMITER //
+CREATE PROCEDURE MostExportedProduct(IN startDate DATE,IN endDate DATE)
+BEGIN
+    SELECT 
+        p.Product_Name,
+        SUM(CASE WHEN b.Bill_Type = 0 THEN bd.Quantity ELSE 0 END) AS Total_Export_Quantity
+    FROM BILL b
+    JOIN BILL_DETAIL bd ON b.Bill_id = bd.Bill_Id
+    JOIN PRODUCT p ON bd.Product_Id = p.Product_Id
+    WHERE b.Created BETWEEN startDate AND endDate AND b.Bill_Type = 0
+    GROUP BY bd.Product_Id
+    ORDER BY Total_Export_Quantity DESC
+    LIMIT 1;
+END//
+DELIMITER ;
+CALL MostExportedProduct('2024-01-01', '2024-03-31');
+
+
+
+-- 9.Thống kê sản phẩm xuất ít nhất trong khoảng thời gian
+DELIMITER //
+CREATE PROCEDURE LeastExportedProduct(IN startDate DATE,IN endDate DATE)
+BEGIN
+    SELECT 
+        p.Product_Name,
+        SUM(CASE WHEN b.Bill_Type = 0 THEN bd.Quantity ELSE 0 END) AS Total_Export_Quantity
+    FROM BILL b
+    JOIN BILL_DETAIL bd ON b.Bill_id = bd.Bill_Id
+    JOIN PRODUCT p ON bd.Product_Id = p.Product_Id
+    WHERE b.Created BETWEEN startDate AND endDate
+    GROUP BY bd.Product_Id
+    ORDER BY Total_Export_Quantity ASC
+    LIMIT 1;
+END//
+DELIMITER ;
+CALL LeastExportedProduct('2024-01-01', '2024-03-31');
 
 

@@ -67,4 +67,9 @@ public class BillDetail {
     public void setPrice(float price) {
         this.price = price;
     }
+    public void displayBillDetail(){
+        System.out.printf("| %-20s | %-10s | %-15s | %-10s | %-15s |\n",
+           this.billDetailId,this.billId,this.productId,this.quantity,this.price );
+
+    }
 }

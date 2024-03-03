@@ -1,26 +1,31 @@
 package com.ra;
+
 import com.ra.management.*;
 import com.ra.service.admin.AccountService;
 import com.ra.service.admin.impl.AccountServiceImpl;
-import com.ra.service.user.UserService;
+import com.ra.service.user.impl.UserServiceImpl;
 import com.ra.util.Console;
 
 public class Application {
     public static void main(String[] args) {
         AccountService accountService = new AccountServiceImpl();
-            System.out.print("Username: ");
-            String username = Console.scanner.nextLine();
-            System.out.print("Password: ");
-            String password = Console.scanner.nextLine();
-            String role = accountService.authenticate(username,password) ;
-            if (role.equals("admin")) {
-                adminMenu();
-            } else if (role.equals("user")) {
-                userMenu();
-            } else {
-                System.out.println("Đăng nhập không thành công. Vui lòng thử lại.");
-            }
+        System.out.print("Username: ");
+        String username = Console.scanner.nextLine();
+        System.out.print("Password: ");
+        String password = Console.scanner.nextLine();
+        String role = accountService.authenticate(username, password);
+        if (role.equals("admin")) {
+            System.out.println("Đăng nhập thành công tài khoản admin!");
+            adminMenu();
+        } else if (role.equals("user")) {
+            System.out.println("Đăng nhập thành công tài khoản user!");
+            System.out.println("Mã nhân viên: "+System.getProperty("user.id"));
+            userMenu();
+        } else {
+            System.out.println("Đăng nhập không thành công. Vui lòng thử lại.");
+        }
     }
+
     private static void adminMenu() {
         boolean isExist = true;
         do {
@@ -36,22 +41,22 @@ public class Application {
             int choice = Integer.parseInt(Console.scanner.nextLine());
             switch (choice) {
                 case 1:
-                    ProductManagement.productManagement(Console.scanner);
+                    ProductManagement.productManagement();
                     break;
                 case 2:
-                    EmployeeManagement.employeeManagement(Console.scanner);
+                    EmployeeManagement.employeeManagement();
                     break;
                 case 3:
-                    AccountManagement.accountManagement(Console.scanner);
+                    AccountManagement.accountManagement();
                     break;
                 case 4:
-                    ReceiptManagement.receiptManagement(Console.scanner);
+                    ReceiptManagement.receiptManagement();
                     break;
                 case 5:
-                    BillManagement.billManagement(Console.scanner);
+                    BillManagement.billManagement();
                     break;
                 case 6:
-                    ReportManagement.reportManagement(Console.scanner);
+                    ReportManagement.reportManagement();
                     break;
                 case 7:
                     isExist = false;
@@ -60,10 +65,11 @@ public class Application {
                 default:
                     System.out.println("Lựa chọn không hợp lệ. Vui lòng chọn lại.");
             }
-        }while (isExist);
+        } while (isExist);
     }
 
     private static void userMenu() {
+        UserServiceImpl userService = new UserServiceImpl();
         boolean isExist = true;
         do {
             System.out.println("******************WAREHOUSE MANAGEMENT USER****************");
@@ -80,28 +86,28 @@ public class Application {
             int choice = Integer.parseInt(Console.scanner.nextLine());
             switch (choice) {
                 case 1:
-                    UserService.viewReceiptsByStatus();
+                    userService.viewReceiptsByStatus();
                     break;
                 case 2:
-                    UserService.createReceipt();
+                    userService.createReceipt();
                     break;
                 case 3:
-                    UserService.updateReceipt();
+                    userService.updateReceipt();
                     break;
                 case 4:
-                    UserService.searchReceipt();
+                    userService.searchReceipt();
                     break;
                 case 5:
-                    UserService.viewBillsByStatus();
+                    userService.viewBillsByStatus();
                     break;
                 case 6:
-                    UserService.createBill();
+                    userService.createBill();
                     break;
                 case 7:
-                    UserService.updateBill();
+                    userService.updateBill();
                     break;
                 case 8:
-                    UserService.searchBill();
+                    userService.searchBill();
                     break;
                 case 9:
                     isExist = false;
@@ -110,6 +116,6 @@ public class Application {
                 default:
                     System.out.println("Lựa chọn không hợp lệ. Vui lòng chọn lại.");
             }
-        }while (isExist);
+        } while (isExist);
     }
 }

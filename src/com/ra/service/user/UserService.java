@@ -1,29 +1,20 @@
 package com.ra.service.user;
 
-public class UserService {
-    public static void viewReceiptsByStatus(){
+public interface UserService {
+    void viewReceiptsByStatus();
 
-    }
-    public static void createReceipt(){
+    void createReceipt();
 
-    }
-    public static void updateReceipt(){
+    void updateReceipt();
 
-    }
-    public static void searchReceipt(){
+    void searchReceipt();
 
-    }
-    public static void viewBillsByStatus(){
+    void viewBillsByStatus();
 
-    }
-    public static void createBill(){
+    void createBill();
 
-    }
-    public static void updateBill(){
+    void updateBill();
 
-    }
-    public static void searchBill(){
-
-    }
+    void searchBill();
 
 }

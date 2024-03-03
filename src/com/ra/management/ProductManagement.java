@@ -15,7 +15,7 @@ import java.util.Scanner;
 public class ProductManagement {
     static ProductServiceImpl productService = new ProductServiceImpl();
 
-    public static void productManagement(Scanner scanner) {
+    public static void productManagement() {
         boolean isExist = true;
         do {
             System.out.println("******************PRODUCT MANAGEMENT****************");
@@ -25,7 +25,7 @@ public class ProductManagement {
             System.out.println("4.Tìm kiếm sản phẩm");
             System.out.println("5.Cập nhật trạng thái sản phẩm");
             System.out.println("6.Thoát");
-            System.out.print("Chọn: ");
+            System.out.print("Chọn chức năng: ");
             int choice = Integer.parseInt(Console.scanner.nextLine());
             switch (choice) {
                 case 1:
@@ -48,25 +48,26 @@ public class ProductManagement {
                     System.out.println("Quay lại menu chính.");
                     break;
                 default:
-                    System.out.println("Chọn không hợp lệ. Vui lòng chọn lại.");
+                    System.out.println("Lựa chọn không hợp lệ. Vui lòng chọn lại.");
             }
 
         } while (isExist);
     }
-    public static void displayProductList(){
-        Repository<Product,String> productRepository = new RepositoryImpl<>();
+
+    public static void displayProductList() {
+        Repository<Product, String> productRepository = new RepositoryImpl<>();
         List<Product> productList = productRepository.findAll(Product.class);
 
         if (!productList.isEmpty()) {
             System.out.println("Danh sách sản phẩm:");
-            System.out.format("%-15s%-30s%-20s%-20s%-15s%-10s%-15s\n",
+            System.out.format("%-15s%-35s%-20s%-20s%-15s%-10s%-15s\n",
                     "Mã sản phẩm", "Tên sản phẩm", "Nhà sản xuất",
                     "Ngày tạo", "Lô", "Số lượng", "Trạng thái");
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             for (Product product : productList) {
-                System.out.format("%-15s%-30s%-20s%-20s%-15d%-10d%-15s\n",
+                System.out.format("%-15s%-35s%-20s%-20s%-15d%-10d%-15s\n",
                         product.getProductId(), product.getProductName(),
                         product.getManufacturer(), dateFormat.format(product.getCreated()),
                         product.getBatch(), product.getQuantity(),
@@ -76,8 +77,9 @@ public class ProductManagement {
             System.out.println("Không có sản phẩm nào trong danh sách.");
         }
     }
-    public static void addProduct(){
-        Repository<Product,String> productRepository = new RepositoryImpl<>();
+
+    public static void addProduct() {
+        Repository<Product, String> productRepository = new RepositoryImpl<>();
         System.out.println("Nhập số sản phẩm cần nhập thông tin:");
         int numberOfProducts = Integer.parseInt(Console.scanner.nextLine());
         for (int i = 0; i < numberOfProducts; i++) {
@@ -106,14 +108,15 @@ public class ProductManagement {
             System.out.println("Thêm mới sản phẩm thành công!");
         }
     }
-    public static void updateProduct(){
-        Repository<Product,String> productRepository = new RepositoryImpl<>();
+
+    public static void updateProduct() {
+        Repository<Product, String> productRepository = new RepositoryImpl<>();
         System.out.println("Nhập vào mã sản phẩm cần cập nhật thông tin:");
         String productId = Console.scanner.nextLine();
         Product productUpdate = productService.findId(productId);
-        if (productUpdate == null){
+        if (productUpdate == null) {
             System.out.println("Không tìm thấy sản phẩm!");
-        }else {
+        } else {
             try {
                 System.out.println("Nhập tên sản phẩm:");
                 String name = Console.scanner.nextLine();
@@ -131,22 +134,23 @@ public class ProductManagement {
                 productUpdate.setProductStatus(status);
                 productRepository.edit(productUpdate);
                 System.out.println("Cập nhật sản phẩm thành công!");
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
-    public static void searchProduct(){
-        Repository<Product,String> productRepository = new RepositoryImpl<>();
+
+    public static void searchProduct() {
+        Repository<Product, String> productRepository = new RepositoryImpl<>();
         System.out.println("Nhập vào tên sản phẩm cần tìm kiếm:");
         String productName = Console.scanner.nextLine();
         Product product = productRepository.findName(productName, Product.class);
         if (product != null) {
-            System.out.format("%-15s%-30s%-20s%-20s%-15s%-10s%-15s\n",
+            System.out.format("%-15s%-35s%-20s%-20s%-15s%-10s%-15s\n",
                     "Mã sản phẩm", "Tên sản phẩm", "Nhà sản xuất",
                     "Ngày tạo", "Lô", "Số lượng", "Trạng thái");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            System.out.format("%-15s%-30s%-20s%-20s%-15d%-10d%-15s\n",
+            System.out.format("%-15s%-35s%-20s%-20s%-15d%-10d%-15s\n",
                     product.getProductId(), product.getProductName(),
                     product.getManufacturer(), dateFormat.format(product.getCreated()),
                     product.getBatch(), product.getQuantity(),
@@ -156,7 +160,7 @@ public class ProductManagement {
         }
     }
 
-    public static void updateProductStatus(){
+    public static void updateProductStatus() {
         Repository<Product, String> productRepository = new RepositoryImpl<>();
         System.out.println("Nhập vào mã sản phẩm cần cập nhật trạng thái:");
         String productId = Console.scanner.nextLine();

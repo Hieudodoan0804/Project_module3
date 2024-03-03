@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class AccountManagement {
-    public static void accountManagement(Scanner scanner) {
+    public static void accountManagement() {
         boolean isExist = true;
         do {
             System.out.println("******************ACCOUNT MANAGEMENT****************");
@@ -19,7 +19,7 @@ public class AccountManagement {
             System.out.println("3.Cập nhật trạng thái tài khoản");
             System.out.println("4.Tìm kiếm tài khoản");
             System.out.println("5.Thoát");
-            System.out.print("Chọn: ");
+            System.out.print("Chọn chức năng: ");
             int choice = Integer.parseInt(Console.scanner.nextLine());
             switch (choice) {
                 case 1:
@@ -39,7 +39,7 @@ public class AccountManagement {
                     System.out.println("Quay lại menu chính.");
                     break;
                 default:
-                    System.out.println("Chọn không hợp lệ. Vui lòng chọn lại.");
+                    System.out.println("Lựa chọn không hợp lệ. Vui lòng chọn lại.");
             }
 
         } while (isExist);
@@ -56,7 +56,7 @@ public class AccountManagement {
             for (Account account : accountList) {
                 System.out.format("%-15s%-30s%-20s%-20s%-15s%-15s\n",
                         account.getAccId(), account.getUserName(),
-                        account.getPassword(), account.isPermission(),
+                        account.getPassword(), account.isPermission() ? "user" : "admin",
                         account.getEmpId(), account.isAccStatus() ? "Active" : "Block");
             }
         } else {
@@ -101,8 +101,32 @@ public class AccountManagement {
                     "Quyền tài khoản", "Mã nhân viên", "Trạng thái");
             System.out.format("%-15s%-30s%-20s%-20s%-15s%-15s\n",
                     account.getAccId(), account.getUserName(),
-                    account.getPassword(), account.isPermission(),
+                    account.getPassword(), account.isPermission() ? "user" : "admin",
                     account.getEmpId(), account.isAccStatus() ? "Active" : "Block");
+            System.out.print("Bạn muốn cập nhật trạng thái tài khoản không (Y/N)?: ");
+            String updateChoice = Console.scanner.nextLine();
+            if (updateChoice.equalsIgnoreCase("Y")) {
+                System.out.println("Chọn trạng thái mới cho tài khoản:");
+                System.out.println("0: Block");
+                System.out.println("1: Active");
+                int newStatus = Integer.parseInt(Console.scanner.nextLine());
+
+                switch (newStatus) {
+                    case 0:
+                        account.setAccStatus(ContStatus.AccountStt.BLOCK);
+                        break;
+                    case 1:
+                        account.setAccStatus(ContStatus.AccountStt.ACTIVE);
+                        break;
+                    default:
+                        System.out.println("Trạng thái không hợp lệ!");
+                        return;
+                }
+                accRepository.edit(account);
+                System.out.println("Cập nhật trạng thái tài khoản thành công!");
+            } else {
+                System.out.println("Quay lại menu chính. ");
+            }
         } else {
             System.out.println("Tài khoản không tồn tại!");
         }

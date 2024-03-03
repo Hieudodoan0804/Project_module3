@@ -159,6 +159,9 @@ public class RepositoryImpl<T,K> implements Repository<T,K> {
                 pst.setObject(index++,f.get(entity));
             }
             int result= pst.executeUpdate();
+            if (result<=0){
+                throw new RuntimeException("Update Không thành công!");
+            }
             return entity;
         }catch (Exception ex) {
             ex.printStackTrace();
