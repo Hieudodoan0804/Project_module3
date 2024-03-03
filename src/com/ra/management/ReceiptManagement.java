@@ -117,7 +117,7 @@ public class ReceiptManagement {
                 billDetaiRepository.add(billDetail);
                 System.out.print("Bạn có muốn tiếp tục nhập không (Y/N)?: ");
                 String ans = Console.scanner.nextLine();
-                if (ans.equals("Y")) {
+                if (ans.equalsIgnoreCase("Y")) {
                     stop = true;
                 }else {
                     break;
@@ -126,7 +126,7 @@ public class ReceiptManagement {
                 System.out.println("Sản phẩm không tồn tại hoặc đã ngừng kinh doanh!");
                 System.out.print("Bạn có muốn tiếp tục nhập không (Y/N)?: ");
                 String ans = Console.scanner.nextLine();
-                if (!ans.equals("Y")) {
+                if (!ans.equalsIgnoreCase("Y")) {
                     stop = true;
                 }
             }
