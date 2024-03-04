@@ -66,9 +66,6 @@ public class AccountManagement {
 
     public static void addAccount() {
         Repository<Account, String> accRepository = new RepositoryImpl<>();
-        System.out.println("Nhập số tài khoản cần nhập thông tin:");
-        int numberOfAcc = Integer.parseInt(Console.scanner.nextLine());
-        for (int i = 0; i < numberOfAcc; i++) {
             Account account = new Account();
             System.out.println("Nhập tên tài khoản:");
             String userName = Console.scanner.nextLine();
@@ -87,7 +84,6 @@ public class AccountManagement {
             account.setAccStatus(status);
             accRepository.add(account);
             System.out.println("Thêm mới tài khoản thành công!");
-        }
     }
 
     public static void searchAccount() {
