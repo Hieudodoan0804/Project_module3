@@ -5,6 +5,9 @@ import com.ra.repository.Repository;
 import com.ra.repository.impl.RepositoryImpl;
 import com.ra.service.admin.EmployeeService;
 
+import java.util.Comparator;
+import java.util.List;
+
 public class EmployeeServiceImpl implements EmployeeService {
     private Repository<Employee,String> employeeRepository = new RepositoryImpl<>();
     @Override
@@ -32,5 +35,12 @@ public class EmployeeServiceImpl implements EmployeeService {
             default:
                 return "Không xác định";
         }
+    }
+
+    public static List<Employee> listEmployee() {
+        Repository<Employee, String> employeeRepository = new RepositoryImpl<>();
+        List<Employee> employeeList = employeeRepository.findAll(Employee.class);
+        employeeList.stream().sorted(Comparator.comparing(Employee::getEmpName)).forEach(employee -> System.out.println(employee.getEmpName()));
+        return employeeList;
     }
 }

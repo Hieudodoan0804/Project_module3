@@ -171,18 +171,16 @@ VALUES
 
 -- 1.Thống kê chi phí theo ngaỳ tháng năm
 DELIMITER //
-CREATE PROCEDURE CostByDate()
+CREATE PROCEDURE CostByDate( out cost float , in date DATE ,in billtype boolean)
 BEGIN
     SELECT 
-        IFNULL(DATE_FORMAT(b.Created, '%Y-%m-%d'), 'Total') AS Year_Month_Date,
         SUM(bd.Quantity * bd.Price) AS Total_Cost
     FROM BILL b
     JOIN BILL_DETAIL bd ON b.Bill_id = bd.Bill_Id
-    JOIN PRODUCT p ON bd.Product_Id = p.Product_Id
-    GROUP BY Year_Month_Date WITH ROLLUP;
+    WHERE b.Bill_STATUS = 2 AND b.BILL_TYPE = billtype AND b.AUTH_DATE = date
+    GROUP BY b.AUTH_DATE;
 END//
 DELIMITER ;
-CALL CostByDate();
 
 
 -- 2.Thống kê chi phí theo khoảng thời gian
@@ -199,7 +197,6 @@ BEGIN
     GROUP BY Year_Month_Date;
 END//
 DELIMITER ;
-CALL CostByTimeRange('2024-01-01', '2024-03-31');
 
 
 -- 3.Thống kê doanh thu theo ngày tháng năm 
